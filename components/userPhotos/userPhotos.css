@@ -1,0 +1,9 @@
+.userPicture{
+    object-fit: contain;
+    width: 100%;
+}
+
+.details{
+    font-family: 'Times New Roman', Times, serif;
+    font: bold;
+}
