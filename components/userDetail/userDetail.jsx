@@ -7,6 +7,7 @@ import {
 import './userDetail.css';
 import fetchModel from "../../lib/fetchModelData";
 
+
 /**
  * Define UserDetail, a React component of project #5
  */
