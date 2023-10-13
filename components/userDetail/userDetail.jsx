@@ -52,7 +52,7 @@ class UserDetail extends React.Component {
                             User Photos
                         </Button>
                     </div>
-                    <div>
+                    <div className="first-name">
                         <TextField id="first_name" label="First Name" variant="outlined" disabled fullWidth
                                    margin="normal"
                                    value={this.state.user.first_name}/>
