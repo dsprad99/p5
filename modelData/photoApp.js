@@ -1,4 +1,5 @@
 "use strict";
+
 /* jshint node: true */
 /*
  * Model data for Project #5 - the photo sharing site.
