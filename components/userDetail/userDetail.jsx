@@ -1,56 +1,88 @@
 import React from 'react';
-import { Link } from 'react-router-dom'; // Import Link from React Router
 import {
-  Typography,
-  Button,
+    Box,
+    Button,
+    TextField
 } from '@mui/material';
 import './userDetail.css';
-
+import fetchModel from "../../lib/fetchModelData";
 
 /**
  * Define UserDetail, a React component of project #5
  */
 class UserDetail extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      //create a blank user object
-      user: null,
-    };
-  }
+    constructor(props) {
+        super(props);
+        this.state = {
+            user: undefined
+        };
+    }
+    componentDidMount() {
+        const new_user_id = this.props.match.params.userId;
+        this.handleUserChange(new_user_id);
+    }
 
-  componentDidMount() {
-    //get the userID from route parameters
-    const userId = this.props.match.params.userId;
-    const user = window.models.userModel(userId);
-    //update components state with user data
-    this.setState({ user });
-  }
+    componentDidUpdate() {
+        const new_user_id = this.props.match.params.userId;
+        const current_user_id = this.state.user?._id;
+        if (current_user_id  !== new_user_id){
+            this.handleUserChange(new_user_id);
+        }
+    }
 
-  render() {
-    const { user } = this.state;
-    return (
-      <div className="details">
-        {/*if the user object does exist....*/}
-        {user ? (
-          <div>
-            <Typography variant="h2">{user.first_name} {user.last_name}</Typography>
-            <Typography className="location" variant="h6">Location: {user.location}</Typography>
-            <Typography variant="body2">Description: {user.description}</Typography>
-            <Typography variant="body2">Occupation: {user.occupation}</Typography>
-            <Button
-              variant="contained"
-              component={Link}
-              to={`/photos/${user._id}`}>
-              View Personal Page
-            </Button>
-          </div>
-          //if no user then nothing is displayed
-        ) : null}
-      </div>
-    );
-  }
-       
+    handleUserChange(user_id){
+        fetchModel("/user/" + user_id)
+            .then((response) =>
+            {
+                const new_user = response.data;
+                this.setState({
+                    user: new_user
+                });
+                const main_content = "User Details for " + new_user.first_name + " " + new_user.last_name;
+                this.props.changeMainContent(main_content);
+            });
+    }
+
+    render() {
+        return this.state.user ? (
+            <div>
+                <Box component="form" noValidate autoComplete="off">
+                    <div>
+                        <Button variant="contained" component="a" href={"#/photos/" + this.state.user._id}>
+                            User Photos
+                        </Button>
+                    </div>
+                    <div>
+                        <TextField id="first_name" label="First Name" variant="outlined" disabled fullWidth
+                                   margin="normal"
+                                   value={this.state.user.first_name}/>
+                    </div>
+                    <div>
+                        <TextField id="last_name" label="Last Name" variant="outlined" disabled fullWidth
+                                   margin="normal"
+                                   value={this.state.user.last_name}/>
+                    </div>
+                    <div>
+                        <TextField id="location" label="Location" variant="outlined" disabled fullWidth
+                                   margin="normal"
+                                   value={this.state.user.location}/>
+                    </div>
+                    <div>
+                        <TextField id="description" label="Description" variant="outlined" multiline rows={4}
+                                   disabled
+                                   fullWidth margin="normal" value={this.state.user.description}/>
+                    </div>
+                    <div>
+                        <TextField id="occupation" label="Occupation" variant="outlined" disabled fullWidth
+                                   margin="normal"
+                                   value={this.state.user.occupation}/>
+                    </div>
+                </Box>
+            </div>
+        ) : (
+            <div/>
+        );
+    }
 }
 
 export default UserDetail;
