@@ -1,83 +1,136 @@
-import React from 'react';
-import {
-  Typography,
-  Card,
-  CardContent,
-  CardHeader,
-  CardMedia,
-  Link,
-} from '@mui/material';
-import './userPhotos.css';
+import React from "react";
+import { Button, TextField, ImageList, ImageListItem } from "@mui/material";
+import "./userPhotos.css";
+import fetchModel from "../../lib/fetchModelData";
 
 /**
- * Define UserPhoto, a React component of project #5
+ * Define UserPhotos, a React componment of project #5
  */
-
 class UserPhotos extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      //create a blank user object
-      user: null,
-      //create an empty array for photos
-      photos: [],
+      user_id: undefined,
+      photos: undefined,
     };
   }
 
   componentDidMount() {
-    const userId = this.props.match.params.userId;
-    //get the list of user when the component mounts
-    const user = window.models.userModel(userId);
-    //get the list of photos that belong to a user
-    const photos = window.models.photoOfUserModel(userId);
-    this.setState({ user, photos });
+    const new_user_id = this.props.match.params.userId;
+    this.handleUserChange(new_user_id);
+  }
+
+  componentDidUpdate() {
+    const new_user_id = this.props.match.params.userId;
+    const current_user_id = this.state.user_id;
+    if (current_user_id !== new_user_id) {
+      this.handleUserChange(new_user_id);
+    }
+  }
+
+  handleUserChange(user_id) {
+    fetchModel("/photosOfUser/" + user_id).then((response) => {
+      this.setState({
+        user_id: user_id,
+        photos: response.data,
+      });
+    });
+    fetchModel("/user/" + user_id).then((response) => {
+      const new_user = response.data;
+      const main_content =
+        "User Photos for " + new_user.first_name + " " + new_user.last_name;
+      this.props.changeMainContent(main_content);
+    });
   }
 
   render() {
-    const {user, photos} = this.state;
-
-    return (
-      <div className = "details">
-        {/*As long as a user exists and theres user data*/}
-        {user && (
-          <Typography variant="h2">{`Photos of ${user.first_name}`}</Typography>
-        )}
-        {/*map over the users photos to create cards*/}
-        {photos.map((photo) => (
-          //create a card components for each users photo
-          <Card key={photo._id} className="photo-card">
-            {/*create a card head for each users card component*/}
-            <CardHeader
-              subheader={`Date posted: ${photo.date_time}`}
-            />
-            {/*create a card image for each users card component*/}
-            <CardMedia
-              className = "userPicture"
-              component="img"
-              src={`images/${photo.file_name}`
-              } 
+    return this.state.user_id ? (
+      <div>
+        <div>
+          <Button
+            variant="contained"
+            component="a"
+            href={"#/users/" + this.state.user_id}
+          >
+            User Detail
+          </Button>
+        </div>
+        <ImageList variant="masonry" cols={1} gap={8}>
+          {this.state.photos.map((item) => (
+            <div key={item._id}>
+              <TextField
+                id="date"
+                label="Photo Date"
+                variant="outlined"
+                disabled
+                fullWidth
+                margin="normal"
+                value={item.date_time}
               />
-            {/*create a cards comments associated with the specific picture*/}
-            <CardContent>
-              <Typography variant="h4">Comments:</Typography>
-                {Array.isArray(photo.comments) && photo.comments.length > 0 ? (
-                  photo.comments.map((comment) => (
-                    <div key={comment._id}>
-                      <Typography variant="subtitle2" component="">
-                        <Link to={`/users/${comment.user._id}`}>
-                          {`${comment.user.first_name} ${comment.user.last_name}`}
-                        </Link>{' '} - {`Date created: ${comment.date_time}`}
-                      </Typography>
-                      <Typography variant="subtitle2">{comment.comment}</Typography>
-                    </div>
-                  ))
-                ) : (
-                  <Typography variant="body2">No comments at this time.</Typography>
-                )}
-            </CardContent>
-          </Card>
-        ))}
+              <ImageListItem key={item.file_name}>
+                <img
+                  src={`images/${item.file_name}`}
+                  srcSet={`images/${item.file_name}`}
+                  alt={item.file_name}
+                  loading="lazy"
+                />
+              </ImageListItem>
+              {item.comments ? (
+                item.comments.map((comment) => (
+                  <div key={comment._id}>
+                    <TextField
+                      id="date"
+                      label="Comment Date"
+                      variant="outlined"
+                      disabled
+                      fullWidth
+                      margin="normal"
+                      value={comment.date_time}
+                    />
+                    <TextField
+                      id="user"
+                      label="User"
+                      variant="outlined"
+                      disabled
+                      fullWidth
+                      margin="normal"
+                      value={
+                        comment.user.first_name + " " + comment.user.last_name
+                      }
+                      component="a"
+                      href={"#/users/" + comment.user._id}
+                    />
+                    <TextField
+                      id="comment"
+                      label="Comment"
+                      variant="outlined"
+                      disabled
+                      fullWidth
+                      margin="normal"
+                      multiline
+                      rows={4}
+                      value={comment.comment}
+                    />
+                  </div>
+                ))
+              ) : (
+                <div>
+                  <TextField
+                    id="comment"
+                    label="No Comments"
+                    variant="outlined"
+                    disabled
+                    fullWidth
+                    margin="normal"
+                  />
+                </div>
+              )}
+            </div>
+          ))}
+        </ImageList>
       </div>
+    ) : (
+      <div />
     );
   }
 }
