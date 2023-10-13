@@ -61,7 +61,7 @@ class UserPhotos extends React.Component {
                 <ImageList variant="masonry" cols={1} gap={8}>
                     {this.state.photos.map((item) => (
                         <div key={item._id}>
-                            <TextField className = "photo-date" id="date" label="Photo Date" variant="outlined" disabled fullWidth margin="normal"
+                            <TextField id="date" label="Photo Date" variant="outlined" disabled fullWidth margin="normal"
                                        value={item.date_time} />
                             <ImageListItem key={item.file_name}>
                                 <img
@@ -101,4 +101,3 @@ class UserPhotos extends React.Component {
 }
 
 export default UserPhotos;
-
