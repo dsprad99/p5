@@ -1,17 +1,5 @@
 # Project 5: Single Page Applications [^1]
 
-## Scrum Team
-### Product Owners
-- Todd Dobbs
-- Mahathi Bandari
-### Scrum Master
-- Julien Shishkovskiy (Djis247)
-### Developers
-- Inna Visotskaya (Iklimov1)
-- Davis Spradling (dsprad99)
-- Beren Brande (BareRen)
-- Connor Michaud (Cmichau11)
-
 ## Setup
 
 You should already have installed Node.js and the npm package manager on your system. If not, follow the installation instructions in [Project 0](https://github.com/btdobbs/WA/edit/main/Project/00/README.md) now.
