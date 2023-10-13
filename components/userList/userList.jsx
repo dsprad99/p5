@@ -1,50 +1,73 @@
 import React from 'react';
-import { Link } from 'react-router-dom'; // Import Link from React Router
 import {
-  Divider,
   List,
-  ListItem,
+  ListItemButton,
   ListItemText,
-  Typography,
-} from '@mui/material';
+}
+from '@mui/material';
 import './userList.css';
+import fetchModel from "../../lib/fetchModelData";
 
 /**
  * Define UserList, a React component of project #5
  */
-
 class UserList extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      //create an empty array for users
-      users: [], 
-    };
-  }
+    constructor(props) {
+        super(props);
+        this.state = {
+                users: undefined,
+                user_id: undefined
+            };
+    }
 
-  componentDidMount() {
-    //get the list of users when the component mounts
-    const users = window.models.userListModel();
-    //update the components state
-    this.setState({ users });
-  }
+    componentDidMount() {
+        this.handleUserListChange();
+    }
+
+    componentDidUpdate() {
+        const new_user_id = this.props.match?.params.userId;
+        //console.log(new_user_id);
+        const current_user_id = this.state.user_id;
+        //console.log(current_user_id);
+        if (current_user_id  !== new_user_id){
+            this.handleUserChange(new_user_id);
+        }
+    }
+
+    handleUserChange(user_id){
+        this.setState({
+            user_id: user_id
+        });
+    }
+
+    handleUserListChange(){
+        fetchModel("/user/list")
+            .then((response) =>
+            {
+                this.setState({
+                    users: response.data
+                });
+            });
+    }
 
   render() {
-    return (
-      <div className = "details">
+    return this.state.users ?(
+        <div>
         <List component="nav">
-          {/*map over the list to create list items displayed on the left*/}
-          {this.state.users.map((user) => (
-            <div key={user._id}>
-              {/*create list item with link to user's userDetail page*/}
-              <ListItem button component={Link} to={`/users/${user._id}`}>
-                <ListItemText primary={`${user.first_name} ${user.last_name}`} />
-              </ListItem>
-              <Divider />
-            </div>
-          ))}
+            {
+                this.state.users.map(user => (
+                <ListItemButton selected={this.state.user_id === user._id}
+                                key={user._id}
+                                divider={true}
+                                component="a" href={"#/users/" + user._id}>
+                    <ListItemText primary={user.first_name + " " + user.last_name} />
+                </ListItemButton>
+            ))
+            }
         </List>
-      </div>
+        </div>
+    ) : (
+        <div/>
     );
   }
 }
