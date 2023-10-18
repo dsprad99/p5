@@ -7,6 +7,7 @@ import {
 from '@mui/material';
 import './userList.css';
 import fetchModel from "../../lib/fetchModelData";
+import axios from 'axios';
 
 
 /**
@@ -42,7 +43,7 @@ class UserList extends React.Component {
     }
 
     handleUserListChange(){
-        fetchModel("/user/list")
+        axios.get("/user/list")
             .then((response) =>
             {
                 this.setState({
