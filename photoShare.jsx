@@ -18,14 +18,22 @@ class PhotoShare extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      main_content: undefined
+      main_content: undefined,
+      advanced_features: false
     };
     this.changeMainContent = this.changeMainContent.bind(this);
+    this.toggleAdvancedFeatures = this.toggleAdvancedFeatures.bind(this);
   }
 
   changeMainContent = (main_content) => {
     this.setState({ main_content: main_content });
   };
+
+  toggleAdvancedFeatures() {
+    this.setState({
+      advanced_features: !this.state.advanced_features
+    });
+  }
 
   render() {
     return (
@@ -33,7 +41,7 @@ class PhotoShare extends React.Component {
       <div>
       <Grid container spacing={8}>
         <Grid item xs={12}>
-          <TopBar main_content={this.state.main_content}/>
+          <TopBar main_content={this.state.main_content} toggle_feature={this.toggleAdvancedFeatures}/>
         </Grid>
         <div className="main-topbar-buffer"/>
         <Grid item sm={3}>

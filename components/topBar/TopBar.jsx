@@ -1,9 +1,8 @@
 import React from 'react';
 import {
-    AppBar, Toolbar, Typography
+    AppBar, Toolbar, Typography, Checkbox
 } from '@mui/material';
 import './TopBar.css';
-import fetchModel from "../../lib/fetchModelData";
 import axios from 'axios';
 
 
@@ -16,6 +15,8 @@ class TopBar extends React.Component {
         this.state = {
             app_info: undefined
         };
+
+        this.toggleFeature = props.toggle_feature;
     }
 
     componentDidMount() {
@@ -40,6 +41,9 @@ class TopBar extends React.Component {
       <AppBar className="topbar-appBar" position="absolute">
         <Toolbar>
             <Typography variant="h5" component="div" sx={{ flexGrow: 1 }}>Software Co</Typography>
+            <Typography variant="span" component="div" sx={{ flexGrow: 1 }}>Advanced Features
+            <Checkbox color="default" onChange={this.toggleFeature}></Checkbox>
+            </Typography>
             <Typography variant="h5" component="div" sx={{ flexGrow: 1 }} color="inherit">{this.props.main_content}</Typography>
             <Typography variant="h5" component="div" color="inherit">Version: {this.state.app_info.__v}</Typography>
         </Toolbar>
