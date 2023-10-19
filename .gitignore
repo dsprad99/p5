@@ -3,6 +3,7 @@
 .AppleDouble
 .LSOverride
 compiled/
+.vscode/
 
 # Thumbnails
 ._*
