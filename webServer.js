@@ -112,7 +112,6 @@ app.get("/user/:id", async function (request, response) {
 
 // Route to fetch photos of a user by ID
 app.get("/photosOfUser/:id", async function (request, response) {
-  console.log("request", request.params);
   const userId = request.params.id;
 
   try {
