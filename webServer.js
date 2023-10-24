@@ -101,38 +101,32 @@ app.get("/user/:id", async function (request, response) {
 
 // Route to fetch photos of a user by ID
 app.get("/photosOfUser/:id", async function (request, response) {
-  console.log("request", request.params);
   const userId = request.params.id;
 
   try {
     const photos = await Photo.find({ user_id: userId });
-    console.log("photos", photos);
 
     if (photos.length === 0) {
       response.status(400).json({ error: "No photos found for the user" });
     } else {
-      const userPromises = photos.map((photo) =>
-        photo.comments.map(async (comment) => {
-          const user = await User.findById(comment.user_id);
-          if (user) comment.user = user;
-          return comment;
-        })
-      );
-      // const userPromises = photos.map(async (photo) => {
-      //   console.log("photo", photo);
-      //   const user = await User.findById(photo.user_id);
-      //   console.log("user_id", user_id, "user", user);
+      // const userPromises = photos.map((photo) => {
+      //   let photoDetails = photo;
 
-      //   if (user) {
-      //     console.log("user", user);
-      //     photo.user = user; // Add the user data to the photo object
-      //   }
-      //   return photo;
+      //   const detailedComments = photo.comments.map(async (comment) => {
+      //     const user = await User.findById(comment.user_id);
+      //     if (user) comment.user = user;
+      //     return comment;
+      //   });
+
+      //   photoDetails.comments = detailedComments;
+
+      //   return photoDetails;
       // });
 
-      const photosWithUsers = await Promise.all(userPromises);
+      // const photosWithUsers = await Promise.all(userPromises);
 
-      response.json(photosWithUsers);
+      // response.json(photosWithUsers);
+      response.json(photos);
     }
   } catch (error) {
     response.status(500).json({ error: error.message });
