@@ -44,10 +44,23 @@ const SchemaInfo = require("./schema/schemaInfo.js");
 
 mongoose.set("strictQuery", false);
 // Modify the mongoose.connect to connect to your MongoDB database.
-mongoose.connect("mongodb://localhost:27017/project6", {
+mongoose.connect("mongodb://127.0.0.1:27017/project6", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
+
+// Function to get collection counts
+async function getCollectionCounts() {
+  const [userCount, photoCount] = await Promise.all([
+    User.countDocuments(),
+    Photo.countDocuments(),
+  ]);
+
+  return {
+    user: userCount,
+    photo: photoCount,
+  };
+}
 
 app.use(express.static(__dirname));
 
@@ -88,14 +101,12 @@ app.get("/user/:id", async function (request, response) {
   const userId = request.params.id;
 
   try {
-    const user = await User.findById(userId);
-    if (!user) {
-      response.status(400).json({ error: "User not found" });
-    } else {
-      response.json(user);
-    }
+    const user = JSON.parse(JSON.stringify(await User.findById(userId)));
+    delete user.__v;
+    
+    response.json(user);
   } catch (error) {
-    response.status(500).json({ error: error.message });
+    response.status(400).json({ error: "User not found" });
   }
 });
 
@@ -105,52 +116,30 @@ app.get("/photosOfUser/:id", async function (request, response) {
   const userId = request.params.id;
 
   try {
-    const photos = await Photo.find({ user_id: userId });
+    let photos = JSON.parse(JSON.stringify(await Photo.find({ user_id: userId })));
     console.log("photos", photos);
 
     if (photos.length === 0) {
       response.status(400).json({ error: "No photos found for the user" });
     } else {
-      const userPromises = photos.map((photo) =>
-        photo.comments.map(async (comment) => {
-          const user = await User.findById(comment.user_id);
-          if (user) comment.user = user;
+      photos = await Promise.all(photos.map(async (photo) => {
+        delete photo.__v;
+        photo.comments = await Promise.all(photo.comments.map(async (comment) => {
+          let user = JSON.parse(JSON.stringify(await User.find({_id: comment.user_id}, "_id first_name last_name")));
+          comment.user = user[0];
+          delete comment.user_id;
           return comment;
-        })
-      );
-      // const userPromises = photos.map(async (photo) => {
-      //   console.log("photo", photo);
-      //   const user = await User.findById(photo.user_id);
-      //   console.log("user_id", user_id, "user", user);
+        }));
+        console.log("photo", photo);
+        return photo;
+      }));
 
-      //   if (user) {
-      //     console.log("user", user);
-      //     photo.user = user; // Add the user data to the photo object
-      //   }
-      //   return photo;
-      // });
-
-      const photosWithUsers = await Promise.all(userPromises);
-
-      response.json(photosWithUsers);
+      response.status(200).json(photos);
     }
   } catch (error) {
-    response.status(500).json({ error: error.message });
+    response.status(400).json({ error: "No photos found for the user" });
   }
 });
-
-// Function to get collection counts
-async function getCollectionCounts() {
-  const [userCount, photoCount] = await Promise.all([
-    User.countDocuments(),
-    Photo.countDocuments(),
-  ]);
-
-  return {
-    user: userCount,
-    photo: photoCount,
-  };
-}
 
 const server = app.listen(3000, function () {
   const port = server.address().port;
