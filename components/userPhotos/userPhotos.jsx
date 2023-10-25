@@ -1,7 +1,6 @@
 import React from "react";
 import { Button, TextField, ImageList, ImageListItem } from "@mui/material";
 import "./userPhotos.css";
-import fetchModel from "../../lib/fetchModelData";
 import axios from 'axios';
 
 /**

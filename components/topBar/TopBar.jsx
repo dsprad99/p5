@@ -26,11 +26,11 @@ class TopBar extends React.Component {
     handleAppInfoChange(){
         const app_info = this.state.app_info;
         if (app_info === undefined){
-            axios.get("/test/info")
+            axios.get("/test")
                 .then((response) =>
                 {
                     this.setState({
-                        app_info: response.data
+                        app_info: response.data.info
                     });
                 });
         }
