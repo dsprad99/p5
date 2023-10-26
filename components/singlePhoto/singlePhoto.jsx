@@ -46,7 +46,7 @@ class SinglePhoto extends React.Component {
 	render() {
 		return this.state.photo ? (
 			<>
-			{this.props.advanced_features ? <div></div> : <Redirect to="/"></Redirect> }
+			{this.props.advanced_features ? <div></div> : <><div>{this.props.changeMainContent('')}</div><Redirect to="/"></Redirect></> }
 			<List component="div" sx={{width: '100%'}}>
 				<Avatar alt={this.state.photo.file_name} sx={{height: "auto", width: "100%"}} variant="rounded" src={"/images/" + this.state.photo.file_name}/>
 				{this.state.photo.comments.map(comment => (

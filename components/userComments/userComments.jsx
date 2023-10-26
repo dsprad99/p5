@@ -1,5 +1,5 @@
 import React from "react";
-import { Redirect, NavLink } from "react-router-dom";
+import { Redirect, Link } from "react-router-dom";
 import axios from 'axios';
 import { List, ListSubheader, ListItemButton, ListItemAvatar, Avatar, ListItemText } from '@mui/material';
 
@@ -55,14 +55,14 @@ class UserComments extends React.Component {
 				<ListSubheader>Comments:</ListSubheader>
 				{this.state.user_photos.map(photo => (
 					photo.comments.map(comment => (
-						<NavLink key={comment._id} to={"/single-photo/" + photo._id} style={{textDecoration: 'none', color: 'inherit'}}>
+						<Link key={comment._id} to={"/single-photo/" + photo._id} style={{textDecoration: 'none', color: 'inherit'}}>
 							<ListItemButton alignItems="center">
 								<ListItemAvatar sx={{padding: "1em"}}>
 									<Avatar alt={photo.file_name} sx={{height: "100px", width: "100px"}} variant="rounded" src={"/images/" + photo.file_name}/>
 								</ListItemAvatar>
 								<ListItemText primary={comment.comment}/>
 							</ListItemButton>
-						</NavLink>
+						</Link>
 					))
 				))}
 			</List>

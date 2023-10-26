@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   List,
   ListItemButton,
@@ -86,9 +86,9 @@ class UserList extends React.Component {
                     {this.props.advanced_features ? (
                         <>
                             <Chip color="success" label={this.state.usersPropsCounted[user._id].photoCount}/>
-                            <NavLink to={"/comments/" + user._id}>
+                            <Link to={"/comments/" + user._id}>
                                 <Chip color="error" label={this.state.usersPropsCounted[user._id].commentCount} clickable/>
-                            </NavLink>
+                            </Link>
                         </>
                     ) : (<div/>)}
                 </ListItemButton>
