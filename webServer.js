@@ -96,6 +96,22 @@ app.get("/user/list", async function (request, response) {
   }
 });
 
+// Route to fetch the list of photos
+app.get("/photo/list", async function (request, response) {
+  try {
+    const res = JSON.parse(JSON.stringify(await Photo.find({})));
+    res.map(photo => {
+      return (photo.comments.map(comment => {
+        delete comment.user_id;
+        return comment;
+      }));
+    });
+    response.json(res);
+  } catch (error) {
+    response.status(500).json({ error: error.message });
+  }
+});
+
 // Route to fetch user details by ID
 app.get("/user/:id", async function (request, response) {
   const userId = request.params.id;
@@ -137,6 +153,32 @@ app.get("/photosOfUser/:id", async function (request, response) {
     }
   } catch (error) {
     response.status(400).json({ error: "No photos found for the user" });
+  }
+});
+
+// Route to fetch photos of a user by ID
+app.get("/photo/:id", async function (request, response) {
+  const photoId = request.params.id;
+
+  try {
+    let photo = JSON.parse(JSON.stringify(await Photo.findById(photoId)));
+    if (!photo) {
+      response.status(400).json({error: "No photo found"});
+      return;
+    }
+    delete photo.__v;
+    
+    photo.comments = await Promise.all(photo.comments.map(async (comment) => {
+      let user = JSON.parse(JSON.stringify(await User.find({_id: comment.user_id}, "_id first_name last_name")));
+      comment.user = user[0];
+      delete comment.user_id;
+      return comment;
+    }));
+    console.log("single-photo", photoId, photo);
+
+    response.status(200).json(photo);
+  } catch (error) {
+    response.status(400).json({ error: "No photo found" });
   }
 });
 

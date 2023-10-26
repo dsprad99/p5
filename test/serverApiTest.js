@@ -426,4 +426,159 @@ describe("Photo App: Web API Tests", function () {
       );
     });
   });
+
+  //PHOTO SINGLE
+  describe("test /photo/:id", function (done) {
+    let photoList;
+
+    it("can get the list of photos", function (done) {
+      http.get(
+        {
+          hostname: host,
+          port: port,
+          path: "/photo/list",
+        },
+        function (response) {
+          let responseBody = "";
+          response.on("data", function (chunk) {
+            responseBody += chunk;
+          });
+
+          response.on("end", function () {
+            assert.strictEqual(
+              response.statusCode,
+              200,
+              "HTTP response status code not OK"
+            );
+            photoList = JSON.parse(responseBody);
+            done();
+          });
+        }
+      );
+    });
+
+    it("can get each of the photos with /photo/:id", function (done) {
+      const Users = models.userListModel();
+      async.each(
+        photoList,
+        function (realPhoto, callback) {
+          let photo;
+
+          http.get(
+            {
+              hostname: host,
+              port: port,
+              path: "/photo/" + realPhoto._id,
+            },
+            function (response) {
+              let responseBody = "";
+              response.on("data", function (chunk) {
+                responseBody += chunk;
+              });
+              response.on("error", function (err) {
+                callback(err);
+              });
+
+              response.on("end", function () {
+                assert.strictEqual(
+                  response.statusCode,
+                  200,
+                  "HTTP response status code not OK"
+                );
+                photo = JSON.parse(responseBody);
+                
+                const extraProps1 = _.difference(
+                    Object.keys(removeMongoProperties(photo)),
+                    photoProperties
+                  );
+
+                assert.strictEqual(
+                  extraProps1.length,
+                  0,
+                  "photo object has extra properties: " + extraProps1
+                );
+                assertEqualDates(photo.date_time, realPhoto.date_time);
+                assert.strictEqual(photo.file_name, realPhoto.file_name);
+
+                if (realPhoto.comments) {
+                  assert.strictEqual(
+                    photo.comments.length,
+                    realPhoto.comments.length,
+                    "comments on photo " + realPhoto.file_name
+                  );
+
+                  _.forEach(realPhoto.comments, function (real_comment) {
+                    const comment = _.find(photo.comments, {
+                      comment: real_comment.comment,
+                    });
+                    assert(comment);
+                    const extraProps2 = _.difference(
+                      Object.keys(removeMongoProperties(comment)),
+                      commentProperties
+                    );
+                    assert.strictEqual(
+                      extraProps2.length,
+                      0,
+                      "comment object has extra properties: " + extraProps2
+                    );
+                    assertEqualDates(
+                      comment.date_time,
+                      real_comment.date_time
+                    );
+
+                    const extraProps3 = _.difference(
+                      Object.keys(removeMongoProperties(comment.user)),
+                      userListProperties
+                    );
+                    assert.strictEqual(
+                      extraProps3.length,
+                      0,
+                      "comment user object has extra properties: " +
+                        extraProps3
+                    );
+
+                    // assert.strictEqual(
+                    //   comment.user.first_name,
+                    //   user.first_name
+                    // );
+                    // assert.strictEqual(
+                    //   comment.user.last_name,
+                    //   user.last_name
+                    // );
+                  });
+                } else {
+                  assert(!photo.comments || photo.comments.length === 0);
+                }
+                callback();
+              });
+            }
+          );
+        },
+        function (err) {
+          done();
+        }
+      );
+    });
+
+    it("can return a 400 status on an invalid id to photo", function (done) {
+      http.get(
+        {
+          hostname: host,
+          port: port,
+          path: "/photo/randomIDthatDoesNotExist192031928419029",
+        },
+        function (response) {
+          let responseBody = "";
+          response.on("data", function (chunk) {
+            responseBody += chunk;
+          });
+
+          response.on("end", function () {
+            assert.strictEqual(response.statusCode, 400);
+            done();
+          });
+        }
+      );
+    });
+  });
 });
