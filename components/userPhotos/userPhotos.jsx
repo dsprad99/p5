@@ -24,7 +24,7 @@ class UserPhotos extends React.Component {
     const new_user_id = this.props.match.params.userId;
     const current_user_id = this.state.user_id;
     if (current_user_id !== new_user_id) {
-      //   this.handleUserChange(new_user_id);
+        this.handleUserChange(new_user_id);
     }
   }
 
@@ -47,8 +47,6 @@ class UserPhotos extends React.Component {
     }
 
   render() {
-    console.log("this.state", this.state);
-
     return this.state.user_id ? (
       <div>
         <div>
