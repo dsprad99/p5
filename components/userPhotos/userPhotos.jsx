@@ -1,7 +1,13 @@
 import React from "react";
-import { Button, TextField, ImageList, ImageListItem } from "@mui/material";
+import {
+  Button,
+  TextField,
+  ImageList,
+  ImageListItem,
+  Collapse,
+} from "@mui/material";
 import "./userPhotos.css";
-import axios from 'axios';
+import axios from "axios";
 
 /**
  * Define UserPhotos, a React componment of project #5
@@ -10,6 +16,7 @@ class UserPhotos extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      comment_form: null,
       user_id: undefined,
       photos: undefined,
     };
@@ -24,27 +31,35 @@ class UserPhotos extends React.Component {
     const new_user_id = this.props.match.params.userId;
     const current_user_id = this.state.user_id;
     if (current_user_id !== new_user_id) {
-        this.handleUserChange(new_user_id);
+      this.handleUserChange(new_user_id);
     }
   }
 
-    handleUserChange(user_id){
-        axios.get("/photosOfUser/" + user_id)
-            .then((response) =>
-            {
-                this.setState({
-                    user_id : user_id,
-                    photos: response.data
-                });
-            });
-        axios.get("/user/" + user_id)
-            .then((response) =>
-            {
-                const new_user = response.data;
-                const main_content = "User Photos for " + new_user.first_name + " " + new_user.last_name;
-                this.props.changeMainContent(main_content);
-            });
-    }
+  handleUserChange(user_id) {
+    axios.get("/photosOfUser/" + user_id).then((response) => {
+      this.setState({
+        user_id: user_id,
+        photos: response.data,
+      });
+    });
+    axios.get("/user/" + user_id).then((response) => {
+      const new_user = response.data;
+      const main_content =
+        "User Photos for " + new_user.first_name + " " + new_user.last_name;
+      this.props.changeMainContent(main_content);
+    });
+  }
+
+  creatingComment(photo_id, newComment) {
+    axios
+      .post("/commentsOfPhoto/" + photo_id, newComment)
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((err) => {
+        console.error("err", err);
+      });
+  }
 
   render() {
     return this.state.user_id ? (
@@ -128,6 +143,39 @@ class UserPhotos extends React.Component {
                   />
                 </div>
               )}
+              {/* add comment form*/}
+              <div>
+                {/* show form if comment_form is equal to this item */}
+                <Collapse in={this.state.comment_form == item._id}>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <TextField margin="normal" placeholder="start typing..." />
+                    <Button
+                      onClick={() => {
+                        this.creatingComment(item._id, { comment: ":)" });
+                      }}
+                      variant="contained"
+                      style={{ marginLeft: "4px" }}
+                    >
+                      Save
+                    </Button>
+                  </div>
+                </Collapse>
+                <Button
+                  onClick={() => {
+                    this.setState(({ comment_form }) => ({
+                      comment_form:
+                        comment_form == item._id
+                          ? null // if comment_form equals this item, set comment_form to null to close this form
+                          : item._id, // if not, set comment_form to this item to open this form and close all others
+                    }));
+                  }}
+                  variant="outlined"
+                >
+                  {this.state.comment_form == item._id
+                    ? "Cancel"
+                    : "Add Comment"}
+                </Button>
+              </div>
             </div>
           ))}
         </ImageList>
