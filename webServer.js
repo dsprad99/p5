@@ -37,6 +37,15 @@ mongoose.Promise = require("bluebird");
 const express = require("express");
 const app = express();
 
+
+const session = require("express-session");
+const bodyParser = require("body-parser");
+const multer = require("multer");
+
+app.use(session({secret: "secretKey", resave: false, saveUninitialized: false}));
+app.use(bodyParser.json());
+
+
 // Load the Mongoose schema for User, Photo, and SchemaInfo
 const User = require("./schema/user.js");
 const Photo = require("./schema/photo.js");
@@ -182,6 +191,23 @@ app.get("/photo/:id", async function (request, response) {
   }
 });
 
+app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+    const user = await User.findOne({ username }).exec();
+
+    if (!user) {
+      return res.status(401).json({ message: 'Login failed' });
+    }
+
+    if (password === user.password) {
+      // Login successful
+      res.status(200).json({ message: 'Login successful', user });
+    } else {
+      // Login failed
+      res.status(401).json({ message: 'Login failed' });
+    }
+});
+
 const server = app.listen(3000, function () {
   const port = server.address().port;
   console.log(
@@ -191,3 +217,4 @@ const server = app.listen(3000, function () {
       __dirname
   );
 });
+
