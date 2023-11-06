@@ -7,19 +7,32 @@ const Login = (props) => {
   const [credentials, setCredentials] = useState({ username: '', password: '' });
   
   const handleChange = (event) => {
-    const { name, value } = event.target;
-    setCredentials({ ...credentials, [name]: value });
+    const { userName } = event.target;
+    setCredentials({ credentials, userName});
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    try {
-      const response = await axios.post('/login', credentials);
+      try {
+        //pass in our credentials to the post request
+      const response = await axios.post('/admin/login/', credentials);
       //handle response
       console.log(response.data);
     } catch (error) {
       console.error('Login failed:', error);
     }
+    };
+    
+    const handleLogout = async (event) => {
+        event.preventDefault();
+        try {
+            //pass in our credentials to the post request
+        const response = await axios.post('/admin/logout/', credentials);
+        //handle response
+        console.log(response.data);
+        } catch (error) {
+        console.error('Login failed:', error);
+        }
   };
 
   return (
@@ -37,18 +50,6 @@ const Login = (props) => {
         autoComplete="username"
         autoFocus
         value={credentials.username}
-        onChange={handleChange}
-      />
-      <TextField
-        margin="normal"
-        required
-        fullWidth
-        name="password"
-        label="Password"
-        type="password"
-        id="password"
-        autoComplete="current-password"
-        value={credentials.password}
         onChange={handleChange}
       />
       <Button
