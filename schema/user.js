@@ -11,7 +11,10 @@ const userSchema = new mongoose.Schema({
   location: String,
   description: String,
   occupation: String,
+  username:String,
+  password: String
 });
+
 
 /**
  * Create a Mongoose Model for a User using the userSchema.
