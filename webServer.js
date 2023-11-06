@@ -36,6 +36,7 @@ mongoose.Promise = require("bluebird");
 
 const express = require("express");
 const app = express();
+const bodyParser = require("body-parser");
 
 // Load the Mongoose schema for User, Photo, and SchemaInfo
 const User = require("./schema/user.js");
@@ -63,6 +64,7 @@ async function getCollectionCounts() {
 }
 
 app.use(express.static(__dirname));
+app.use(bodyParser.json());
 
 app.get("/", function (request, response) {
   response.send("Simple web server of files from " + __dirname);
@@ -220,12 +222,16 @@ app.post("/commentsOfPhoto/:photo_id", async function (request, response) {
 
   try {
     // get photo that new comment should be added to
-    let photo = JSON.parse(JSON.stringify(await Photo.findById(photoId)));
+    let photo = await Photo.findById(photoId);
 
     // append new comment to photo comments array
-    photo.comments.push(newComment);
+    photo.comments.push({
+      comment: newComment,
+      user_id: "USER-ID" // TODO: Get the currently logged in user id and put it here
+    });
 
-    //photo.save();
+    photo.save();
+    photo = JSON.parse(JSON.stringify(photo));
     response.status(200).json(photo);
   } catch (e) {}
 });
