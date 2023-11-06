@@ -197,6 +197,9 @@ app.get("/admin/login/:id", async function (request, response) {
     response.status(400).json({ error: "No photo found" });
     return;
   }
+  else {
+    return userName;
+  }
 });
 
 // Route to fetch logout of a user by ID
@@ -220,5 +223,6 @@ const server = app.listen(3000, function () {
       __dirname
   );
 });
+
 
 
