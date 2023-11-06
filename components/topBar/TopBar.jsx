@@ -6,9 +6,6 @@ import './TopBar.css';
 import axios from 'axios';
 
 
-/**
- * Define TopBar, a React componment of project #5
- */
 class TopBar extends React.Component {
     constructor(props) {
         super(props);
@@ -37,19 +34,32 @@ class TopBar extends React.Component {
     }
 
   render() {
-    return this.state.app_info ? (
+    return (
       <AppBar className="topbar-appBar" position="absolute">
         <Toolbar>
-            <Typography variant="h5" component="div" sx={{ flexGrow: 1 }}>Software Co</Typography>
-            <Typography variant="span" component="div" sx={{ flexGrow: 1 }}>Advanced Features
+          <Typography variant="h5" component="div" sx={{ flexGrow: 1 }}>
+            Software Co
+          </Typography>
+          <Typography variant="span" component="div" sx={{ flexGrow: 1 }}>
+            Advanced Features
             <Checkbox color="default" onChange={this.toggleFeature}></Checkbox>
-            </Typography>
-            <Typography variant="h5" component="div" sx={{ flexGrow: 1 }} color="inherit">{this.props.main_content}</Typography>
-            <Typography variant="h5" component="div" color="inherit">Version: {this.state.app_info.__v}</Typography>
+          </Typography>
+          <Typography variant="h5" component="div" sx={{ flexGrow: 1 }} color="inherit">
+            {this.props.main_content}
+          </Typography>
+          <Typography variant="h5" component="div" color="inherit">
+            Version: {this.state.app_info?.__v}
+          </Typography>
+          
+          {/* Conditional rendering for login/logout */}
+          {this.isLoggedIn() ? (
+            <Button color="inherit" onClick={this.handleLogout}>Logout</Button>
+          ) : (
+            <Button color="inherit" onClick={this.handleLogin}>Login</Button>
+          )}
+
         </Toolbar>
       </AppBar>
-    ) : (
-        <div/>
     );
   }
 }
