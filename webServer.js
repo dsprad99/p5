@@ -37,14 +37,12 @@ mongoose.Promise = require("bluebird");
 const express = require("express");
 const app = express();
 
-
 const session = require("express-session");
 const bodyParser = require("body-parser");
 const multer = require("multer");
 
 app.use(session({secret: "secretKey", resave: false, saveUninitialized: false}));
 app.use(bodyParser.json());
-
 
 // Load the Mongoose schema for User, Photo, and SchemaInfo
 const User = require("./schema/user.js");
@@ -191,22 +189,27 @@ app.get("/photo/:id", async function (request, response) {
   }
 });
 
-app.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-    const user = await User.findOne({ username }).exec();
-
-    if (!user) {
-      return res.status(401).json({ message: 'Login failed' });
-    }
-
-    if (password === user.password) {
-      // Login successful
-      res.status(200).json({ message: 'Login successful', user });
-    } else {
-      // Login failed
-      res.status(401).json({ message: 'Login failed' });
-    }
+// Route to fetch login of a user by ID
+app.get("/admin/login/:id", async function (request, response) {
+  const userName = request.params.id; 
+  let user = JSON.parse(JSON.stringify(await User.findById(userName)));
+  if (!user) {
+    response.status(400).json({ error: "No photo found" });
+    return;
+  }
 });
+
+// Route to fetch logout of a user by ID
+app.get("/admin/login/:id", async function (request, response) {
+  const userName = request.params.id; 
+  let user = JSON.parse(JSON.stringify(await User.findById(userName)));
+  if (!user) {
+    response.status(400).json({ error: "No user is logged in" });
+    return;
+  }
+});
+
+
 
 const server = app.listen(3000, function () {
   const port = server.address().port;
@@ -217,4 +220,5 @@ const server = app.listen(3000, function () {
       __dirname
   );
 });
+
 
