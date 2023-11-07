@@ -19,6 +19,7 @@ class UserPhotos extends React.Component {
       comment_form: null,
       user_id: undefined,
       photos: undefined,
+      new_comment: "",
     };
   }
 
@@ -52,7 +53,7 @@ class UserPhotos extends React.Component {
 
   creatingComment(photo_id, newComment) {
     axios
-      .post("/commentsOfPhoto/" + photo_id, newComment)
+      .post(`/commentsOfPhoto/${photo_id}`, { comment: newComment })
       .then((response) => {
         console.log(response);
       })
@@ -62,6 +63,7 @@ class UserPhotos extends React.Component {
   }
 
   render() {
+    console.log("nc", this.state.new_comment);
     return this.state.user_id ? (
       <div>
         <div>
@@ -148,10 +150,19 @@ class UserPhotos extends React.Component {
                 {/* show form if comment_form is equal to this item */}
                 <Collapse in={this.state.comment_form == item._id}>
                   <div style={{ display: "flex", alignItems: "center" }}>
-                    <TextField margin="normal" placeholder="start typing..." />
+                    <TextField
+                      value={this.state.new_comment}
+                      onChange={(event) => {
+                        this.setState({ new_comment: event.target.value });
+                      }}
+                      margin="normal"
+                      placeholder="start typing..."
+                    />
                     <Button
                       onClick={() => {
-                        this.creatingComment(item._id, { comment: ":)" });
+                        this.creatingComment(item._id, {
+                          comment: this.state.new_comment,
+                        });
                       }}
                       variant="contained"
                       style={{ marginLeft: "4px" }}
