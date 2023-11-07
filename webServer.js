@@ -189,29 +189,52 @@ app.get("/photo/:id", async function (request, response) {
   }
 });
 
-// Route to fetch login of a user by ID
-app.get("/admin/login/:id", async function (request, response) {
-  const userName = request.params.id; 
-  let user = JSON.parse(JSON.stringify(await User.findById(userName)));
+//route to log in a user
+app.post("/admin/login", async function (request, response) {
+  const userName = request.body.username;
+  //our user value is set to the users userName
+  let user = await User.findOne({ login_name: userName });
   if (!user) {
-    response.status(400).json({ error: "No photo found" });
-    return;
+    response.status(400).json({ error: "Login Failed" });
   }
   else {
-    return userName;
+    request.session.user = user;
+    response.json({ message: "Logged in successfully", user });
+    
   }
 });
 
-// Route to fetch logout of a user by ID
-app.get("/admin/login/:id", async function (request, response) {
-  const userName = request.params.id; 
-  let user = JSON.parse(JSON.stringify(await User.findById(userName)));
-  if (!user) {
-    response.status(400).json({ error: "No user is logged in" });
-    return;
-  }
+{/*route to log out a user*/}
+app.post("/admin/logout", function (request, response) {
+  // destory current session management in place
+  request.session.destroy(function(err) {
+    if(err) {
+      response.status(400).json({ error: "Log Out Failed" });
+      return;
+    }
+    response.clearCookie('connect.sid', { path: '/' }); 
+    response.json({ message: "Logged out successfully" });
+  });
 });
 
+
+function loggedInCheck(req, res, next) {
+  //if the path is login or logout
+  if (req.path === '/admin/login' || req.path === '/admin/logout') {
+    return next();
+  }
+  //check to see if we have a user session
+  if (req.session.user) {
+    next();
+
+  } else {
+    
+    //if not throw a 401 error
+    res.status(401).json({ error: "Unauthorized" });
+  }
+}
+
+app.use(loggedInCheck);
 
 
 const server = app.listen(3000, function () {
@@ -223,6 +246,5 @@ const server = app.listen(3000, function () {
       __dirname
   );
 });
-
 
 
