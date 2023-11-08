@@ -227,7 +227,7 @@ app.post("/commentsOfPhoto/:photo_id", async function (request, response) {
     // append new comment to photo comments array
     photo.comments.push({
       comment: newComment,
-      user_id: "65425169bd566c8dbe31446f", // TODO: Get the currently logged in user id and put it here
+      user_id: "", // TODO: Get the currently logged in user id and put it here
     });
 
     photo.save();
