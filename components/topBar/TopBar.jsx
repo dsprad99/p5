@@ -5,6 +5,7 @@ import {
 } from '@mui/material';
 import './TopBar.css';
 import axios from 'axios';
+import { Type } from 'js-yaml';
 
 class TopBar extends React.Component {
     constructor(props) {
@@ -65,17 +66,18 @@ class TopBar extends React.Component {
                                 {/* display the first name of our logged in user */}
                                 Hi, {loggedInUser.first_name} 
                             </Typography>
+                            <Typography variant="span" component="div" sx={{ flexGrow: 1 }}>
+                                Advanced Features
+                                <Checkbox color="default" onChange={this.toggleFeature} checked={advanced_features}></Checkbox>
+                            </Typography>
                             {/*log out button*/}
-                            <Button variant="contained" color="error" onClick={this.handleLogout}>
+                            <Button variant="contained" color="error" onClick={this.handleLogout} sx={{ m: 2 }}>
                                 Logout
                             </Button>
                             <Typography sx={{ flexGrow: 1 }}></Typography>
                         </React.Fragment>
                     )}
-                    <Typography variant="span" component="div" sx={{ flexGrow: 1 }}>
-                        Advanced Features
-                        <Checkbox color="default" onChange={this.toggleFeature} checked={advanced_features}></Checkbox>
-                    </Typography>
+                    <Typography sx={{ flexGrow: 3 }}></Typography>
                     {this.state.app_info && (
                         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                             Version: {this.state.app_info.__v}
@@ -88,4 +90,5 @@ class TopBar extends React.Component {
 }
 
 export default withRouter(TopBar);
+
 
