@@ -16,10 +16,11 @@ class UserPhotos extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      comment_form: null,
       user_id: undefined,
       photos: undefined,
       new_comment: "",
+      comment_form: null,
+      saving_comment: false,
     };
   }
 
@@ -52,18 +53,22 @@ class UserPhotos extends React.Component {
   }
 
   creatingComment(photo_id, newComment) {
+    this.setState({ saving_comment: true });
     axios
-      .post(`/commentsOfPhoto/${photo_id}`, { comment: newComment })
+      .post(`/commentsOfPhoto/${photo_id}`, newComment)
       .then((response) => {
-        console.log(response);
+        this.setState({ comment_form: null, new_comment: "" });
+        this.handleUserChange(this.state.user_id);
       })
       .catch((err) => {
         console.error("err", err);
+      })
+      .finally(() => {
+        this.setState({ saving_comment: false });
       });
   }
 
   render() {
-    console.log("nc", this.state.new_comment);
     return this.state.user_id ? (
       <div>
         <div>
@@ -166,6 +171,7 @@ class UserPhotos extends React.Component {
                       }}
                       variant="contained"
                       style={{ marginLeft: "4px" }}
+                      loading={this.state.saving_comment}
                     >
                       Save
                     </Button>
