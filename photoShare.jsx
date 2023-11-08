@@ -36,7 +36,7 @@ class PhotoShare extends React.Component {
 
   /*set our logged in user value to null since no user is logged in*/
   handleLogout() {
-    this.setState({ loggedInUser: null });
+    this.setState({ loggedInUser: null, advanced_features: false });
   }
 
   changeMainContent(main_content) {
