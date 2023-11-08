@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema({
   location: String,
   description: String,
   occupation: String,
+  login_name: String
 });
 
 /**
@@ -22,3 +23,4 @@ const User = mongoose.model("User", userSchema);
  * Make this available to our application.
  */
 module.exports = User;
+

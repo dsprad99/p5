@@ -38,6 +38,13 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 
+const session = require("express-session");
+const bodyParser = require("body-parser");
+const multer = require("multer");
+
+app.use(session({secret: "secretKey", resave: false, saveUninitialized: false}));
+app.use(bodyParser.json());
+
 // Load the Mongoose schema for User, Photo, and SchemaInfo
 const User = require("./schema/user.js");
 const Photo = require("./schema/photo.js");
@@ -236,6 +243,54 @@ app.post("/commentsOfPhoto/:photo_id", async function (request, response) {
   } catch (e) {}
 });
 
+//route to log in a user
+app.post("/admin/login", async function (request, response) {
+  const userName = request.body.username;
+  //our user value is set to the users userName
+  let user = await User.findOne({ login_name: userName });
+  if (!user) {
+    response.status(400).json({ error: "Login Failed" });
+  }
+  else {
+    request.session.user = user;
+    response.json({ message: "Logged in successfully", user });
+    
+  }
+});
+
+{/*route to log out a user*/}
+app.post("/admin/logout", function (request, response) {
+  // destory current session management in place
+  request.session.destroy(function(err) {
+    if(err) {
+      response.status(400).json({ error: "Log Out Failed" });
+      return;
+    }
+    response.clearCookie('connect.sid', { path: '/' }); 
+    response.json({ message: "Logged out successfully" });
+  });
+});
+
+
+function loggedInCheck(req, res, next) {
+  //if the path is login or logout
+  if (req.path === '/admin/login' || req.path === '/admin/logout') {
+    return next();
+  }
+  //check to see if we have a user session
+  if (req.session.user) {
+    next();
+
+  } else {
+    
+    //if not throw a 401 error
+    res.status(401).json({ error: "Unauthorized" });
+  }
+}
+
+app.use(loggedInCheck);
+
+
 const server = app.listen(3000, function () {
   const port = server.address().port;
   console.log(
@@ -245,3 +300,5 @@ const server = app.listen(3000, function () {
       __dirname
   );
 });
+
+
