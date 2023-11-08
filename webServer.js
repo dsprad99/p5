@@ -36,6 +36,7 @@ mongoose.Promise = require("bluebird");
 
 const express = require("express");
 const app = express();
+const bodyParser = require("body-parser");
 
 const session = require("express-session");
 const bodyParser = require("body-parser");
@@ -70,6 +71,7 @@ async function getCollectionCounts() {
 }
 
 app.use(express.static(__dirname));
+app.use(bodyParser.json());
 
 app.get("/", function (request, response) {
   response.send("Simple web server of files from " + __dirname);
@@ -107,11 +109,11 @@ app.get("/user/list", async function (request, response) {
 app.get("/photo/list", async function (request, response) {
   try {
     const res = JSON.parse(JSON.stringify(await Photo.find({})));
-    res.map(photo => {
-      return (photo.comments.map(comment => {
+    res.map((photo) => {
+      return photo.comments.map((comment) => {
         delete comment.user_id;
         return comment;
-      }));
+      });
     });
     response.json(res);
   } catch (error) {
@@ -126,7 +128,7 @@ app.get("/user/:id", async function (request, response) {
   try {
     const user = JSON.parse(JSON.stringify(await User.findById(userId)));
     delete user.__v;
-    
+
     response.json(user);
   } catch (error) {
     response.status(400).json({ error: "User not found" });
@@ -138,23 +140,36 @@ app.get("/photosOfUser/:id", async function (request, response) {
   const userId = request.params.id;
 
   try {
-    let photos = JSON.parse(JSON.stringify(await Photo.find({ user_id: userId })));
+    let photos = JSON.parse(
+      JSON.stringify(await Photo.find({ user_id: userId }))
+    );
     console.log("photos", photos);
 
     if (photos.length === 0) {
       response.status(400).json({ error: "No photos found for the user" });
     } else {
-      photos = await Promise.all(photos.map(async (photo) => {
-        delete photo.__v;
-        photo.comments = await Promise.all(photo.comments.map(async (comment) => {
-          let user = JSON.parse(JSON.stringify(await User.find({_id: comment.user_id}, "_id first_name last_name")));
-          comment.user = user[0];
-          delete comment.user_id;
-          return comment;
-        }));
-        console.log("photo", photo);
-        return photo;
-      }));
+      photos = await Promise.all(
+        photos.map(async (photo) => {
+          delete photo.__v;
+          photo.comments = await Promise.all(
+            photo.comments.map(async (comment) => {
+              let user = JSON.parse(
+                JSON.stringify(
+                  await User.find(
+                    { _id: comment.user_id },
+                    "_id first_name last_name"
+                  )
+                )
+              );
+              comment.user = user[0];
+              delete comment.user_id;
+              return comment;
+            })
+          );
+          console.log("photo", photo);
+          return photo;
+        })
+      );
 
       response.status(200).json(photos);
     }
@@ -170,23 +185,62 @@ app.get("/photo/:id", async function (request, response) {
   try {
     let photo = JSON.parse(JSON.stringify(await Photo.findById(photoId)));
     if (!photo) {
-      response.status(400).json({error: "No photo found"});
+      response.status(400).json({ error: "No photo found" });
       return;
     }
     delete photo.__v;
-    
-    photo.comments = await Promise.all(photo.comments.map(async (comment) => {
-      let user = JSON.parse(JSON.stringify(await User.find({_id: comment.user_id}, "_id first_name last_name")));
-      comment.user = user[0];
-      delete comment.user_id;
-      return comment;
-    }));
+
+    photo.comments = await Promise.all(
+      photo.comments.map(async (comment) => {
+        let user = JSON.parse(
+          JSON.stringify(
+            await User.find(
+              { _id: comment.user_id },
+              "_id first_name last_name"
+            )
+          )
+        );
+        comment.user = user[0];
+        delete comment.user_id;
+        return comment;
+      })
+    );
     console.log("single-photo", photoId, photo);
 
     response.status(200).json(photo);
   } catch (error) {
     response.status(400).json({ error: "No photo found" });
   }
+});
+
+app.post("/commentsOfPhoto/:photo_id", async function (request, response) {
+  // get id of photo that new comment should be added to
+  const photoId = request.params.photo_id;
+
+  // get new comment from request params
+  const newComment = request.body.comment;
+
+  if (!photoId || !newComment) {
+    response.status(400).json({ error: "photo_id and comment are required" });
+  }
+  if (!newComment.trim().length) {
+    response.status(400).json({ error: "Empty comment, please try again" });
+  }
+
+  try {
+    // get photo that new comment should be added to
+    let photo = await Photo.findById(photoId);
+
+    // append new comment to photo comments array
+    photo.comments.push({
+      comment: newComment,
+      user_id: "", // TODO: Get the currently logged in user id and put it here
+    });
+
+    photo.save();
+    photo = JSON.parse(JSON.stringify(photo));
+    response.status(200).json(photo);
+  } catch (e) {}
 });
 
 //route to log in a user
