@@ -257,7 +257,7 @@ app.post("/admin/login", async function (request, response) {
   }
 });
 
-{/*route to log out a user*/}
+//route to log out a user
 app.post("/admin/logout", function (request, response) {
   // destory current session management in place
   request.session.destroy(function(err) {
@@ -274,14 +274,12 @@ app.post("/admin/logout", function (request, response) {
 function loggedInCheck(req, res, next) {
   //if the path is login or logout
   if (req.path === '/admin/login' || req.path === '/admin/logout') {
-    return next();
+    next();
   }
   //check to see if we have a user session
   if (req.session.user) {
     next();
-
   } else {
-    
     //if not throw a 401 error
     res.status(401).json({ error: "Unauthorized" });
   }
