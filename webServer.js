@@ -41,7 +41,9 @@ const session = require("express-session");
 const bodyParser = require("body-parser");
 const multer = require("multer");
 
-app.use(session({secret: "secretKey", resave: false, saveUninitialized: false}));
+app.use(
+  session({ secret: "secretKey", resave: false, saveUninitialized: false })
+);
 app.use(bodyParser.json());
 
 // Load the Mongoose schema for User, Photo, and SchemaInfo
@@ -227,13 +229,18 @@ app.post("/commentsOfPhoto/:photo_id", async function (request, response) {
   }
 
   try {
+    const userId = request.session.user ? request.session.user._id : null;
+    if (!userId) {
+      response.status(401).json({ error: "Unauthorized - User not logged in" });
+      return;
+    }
     // get photo that new comment should be added to
     let photo = await Photo.findById(photoId);
 
     // append new comment to photo comments array
     photo.comments.push({
       comment: newComment,
-      user_id: "", // TODO: Get the currently logged in user id and put it here
+      user_id: userId, // TODO: Get the currently logged in user id and put it here
     });
 
     photo.save();
@@ -249,31 +256,28 @@ app.post("/admin/login", async function (request, response) {
   let user = await User.findOne({ login_name: userName });
   if (!user) {
     response.status(400).json({ error: "Login Failed" });
-  }
-  else {
+  } else {
     request.session.user = user;
     response.json({ message: "Logged in successfully", user });
-    
   }
 });
 
 //route to log out a user
 app.post("/admin/logout", function (request, response) {
   // destory current session management in place
-  request.session.destroy(function(err) {
-    if(err) {
+  request.session.destroy(function (err) {
+    if (err) {
       response.status(400).json({ error: "Log Out Failed" });
       return;
     }
-    response.clearCookie('connect.sid', { path: '/' }); 
+    response.clearCookie("connect.sid", { path: "/" });
     response.json({ message: "Logged out successfully" });
   });
 });
 
-
 function loggedInCheck(req, res, next) {
   //if the path is login or logout
-  if (req.path === '/admin/login' || req.path === '/admin/logout') {
+  if (req.path === "/admin/login" || req.path === "/admin/logout") {
     next();
   }
   //check to see if we have a user session
@@ -287,7 +291,6 @@ function loggedInCheck(req, res, next) {
 
 app.use(loggedInCheck);
 
-
 const server = app.listen(3000, function () {
   const port = server.address().port;
   console.log(
@@ -297,5 +300,3 @@ const server = app.listen(3000, function () {
       __dirname
   );
 });
-
-
