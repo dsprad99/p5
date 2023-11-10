@@ -249,12 +249,51 @@ app.post("/commentsOfPhoto/:photo_id", async function (request, response) {
   } catch (e) {}
 });
 
+
+// route to handle user registration
+app.post('/user', async function (request, response) {
+  const {
+    login_name,
+    password,
+    first_name,
+    last_name,
+    location,
+    description,
+    occupation,
+  } = request.body;
+
+  try {
+    // Check if the login_name already exists
+    const existingUser = await User.findOne({ login_name });
+    if (existingUser) {
+      response.status(400).json({ error: 'Username already exists' });
+      return;
+    }
+
+    // Create a new user
+    const newUser = new User({
+      login_name,
+      password, // Hash the password in a real application
+      first_name,
+      last_name,
+      location,
+      description,
+      occupation,
+    });
+
+    await newUser.save();
+    response.status(200).json({ message: 'User registered successfully' });
+  } catch (error) {
+    response.status(400).json({ error: 'Registration failed' });
+  }
+});
+
 //route to log in a user
 app.post("/admin/login", async function (request, response) {
-  const userName = request.body.username;
+  const {userName, password} = request.body;
   //our user value is set to the users userName
   let user = await User.findOne({ login_name: userName });
-  if (!user) {
+  if (!user || user.password !== password) {
     response.status(400).json({ error: "Login Failed" });
   } else {
     request.session.user = user;
@@ -274,6 +313,8 @@ app.post("/admin/logout", function (request, response) {
     response.json({ message: "Logged out successfully" });
   });
 });
+
+
 
 function loggedInCheck(req, res, next) {
   //if the path is login or logout
