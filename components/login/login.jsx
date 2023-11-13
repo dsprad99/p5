@@ -144,6 +144,7 @@ function LoginRegister(props) {
         <Typography component="h1" variant="h5">
             Register
         </Typography>
+         
         <TextField
             margin="normal"
             required
@@ -184,6 +185,15 @@ function LoginRegister(props) {
             name="occupation"
             autoComplete="occupation-title"
             value={credentials.occupation}
+            onChange={handleChange}
+            />
+         <TextField
+            margin="normal"
+            required
+            label="Username"
+            name="username"
+            autoComplete="username"
+            value={credentials.username}
             onChange={handleChange}
             />
         <TextField
