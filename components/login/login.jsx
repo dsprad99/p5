@@ -54,7 +54,7 @@ const LoginRegister = (props) => {
             return;
         }
         try {
-            const response = await axios.post('/user', {
+            await axios.post('/user', {
                 login_name: credentials.username,
                 password: credentials.password,
                 first_name: credentials.firstName,
