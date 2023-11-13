@@ -83,7 +83,7 @@ class UserList extends React.Component {
                                 divider={true}
                                 component="a" href={"#/users/" + user._id}>
                     <ListItemText primary={user.first_name + " " + user.last_name} />
-                    {this.props.advanced_features ? (
+                    {this.props.advanced_features && this.state.usersPropsCounted[user._id] ? (
                         <>
                             <Chip color="success" label={this.state.usersPropsCounted[user._id].photoCount}/>
                             <Link to={"/comments/" + user._id}>

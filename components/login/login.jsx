@@ -94,7 +94,7 @@ function LoginRegister(props) {
   return (
     <Grid component="form" container onSubmit={handleSubmit} noValidate spacing={3}>
       <Grid component="div" item onSubmit={handleSubmit} noValidate xs>
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{
+        <Box component="div" noValidate sx={{
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -134,7 +134,7 @@ function LoginRegister(props) {
         </Box>
       </Grid>
       <Grid component="div" item onSubmit={handleSubmit} noValidate xs>
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{
+        <Box component="div" noValidate sx={{
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
