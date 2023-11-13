@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Box, Button, TextField, Typography, Snackbar, Alert } from '@mui/material';
 import axios from 'axios';
 
-const LoginRegister = (props) => {
+function LoginRegister = (props) => {
    /*state hook to help manage credential as default will be empty*/
   const [credentials, setCredentials] = useState({
       username: '',
