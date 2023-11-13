@@ -3,22 +3,22 @@ import { Box, Button, TextField, Typography, Snackbar, Alert } from '@mui/materi
 import axios from 'axios';
 
 const LoginRegister = (props) => {
-   {/*state hook to help manage credential as default will be empty*/ }
+   /*state hook to help manage credential as default will be empty*/
   const [credentials, setCredentials] = useState({
       username: '',
       password: '',
       confirmPassword: '',
-      firstname: '',
-      lastname: '',
+      firstName: '',
+      lastName: '',
       location: '',
       description: '',
       occupation: '',
   });
-  {/*set the state for our error as false to start*/}
+  /*set the state for our error as false to start*/
   const [openSnackbar, setOpenSnackbar] = useState(false); 
   const [error, setError] = useState(''); 
 
-  {/*event handler to update the state with new input*/}
+  /*event handler to update the state with new input*/
   const handleChange = (event) => {
     const { name, value } = event.target;
     setCredentials({ ...credentials, [name]: value });
@@ -27,26 +27,32 @@ const LoginRegister = (props) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      {/*send post request to try and log in*/}
+      /*send post request to try and log in*/
       const response = await axios.post('/admin/login', {
         username: credentials.username,
           password: credentials.password,
       });
       props.onLogin(response.data.user);
-      {/*opens the logged in users details up first*/}
+      /*opens the logged in users details up first*/
       props.history.push(`/users/${response.data.user._id}`);
     }
     
     //if theres a catch then a username was incorrectly entered
     catch (error) {
       setError('Login failed. Please try again.'); 
-      {/*show our error*/}
+      /*show our error*/
       setOpenSnackbar(true); 
     }
   };
 
     const handleRegister = async (event) => {
         event.preventDefault();
+        // Check if passwords match
+        if (credentials.password !== credentials.confirmPassword) {
+            setError('Passwords do not match');
+            setOpenSnackbar(true);
+            return;
+        }
         try {
             const response = await axios.post('/user', {
                 login_name: credentials.username,
@@ -70,6 +76,7 @@ const LoginRegister = (props) => {
             });
             setError('Registration successful');
             setOpenSnackbar(true);
+            // eslint-disable-next-line no-shadow
         } catch (error) {
             setError('Registration failed. Please check your information.');
             setOpenSnackbar(true);
@@ -81,6 +88,7 @@ const LoginRegister = (props) => {
       return;
     }
     setOpenSnackbar(false);
+    setError('');
   };
 
   return (
@@ -225,6 +233,5 @@ export default LoginRegister;
 
 
 
-  
   
 
