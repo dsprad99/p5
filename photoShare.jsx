@@ -76,7 +76,6 @@ class PhotoShare extends React.Component {
 
             {/* Only render UserList and detail views if logged in */}
             {loggedInUser && (
-              <>
               <Grid container spacing={8}>
                 <div className="main-topbar-buffer"/>
                 <Grid item sm={3}>
@@ -86,34 +85,33 @@ class PhotoShare extends React.Component {
                 </Grid>
                 <Grid item sm={9}>
                   <Paper className="main-grid-item">
-                     <Switch>
-                      <Route path="/users/:userId"
-                            render={ props => <UserDetail {...props} changeMainContent={this.changeMainContent}/> }
-                      />
-                      <Route path="/photos/:userId"
-                            render ={ props => <UserPhotos {...props} changeMainContent={this.changeMainContent}/> }
-                      />
-                      <Route path="/comments/:userId"
-                            render ={ props => <UserComments {...props} changeMainContent={this.changeMainContent} advanced_features={this.state.advanced_features}/> }
-                      />
-                      <Route path="/single-photo/:photoId"
-                            render ={ props => <SinglePhoto {...props} changeMainContent={this.changeMainContent} advanced_features={this.state.advanced_features}/> }
+                    <Switch>
+                        <Route path="/users/:userId"
+                              render={ props => <UserDetail {...props} changeMainContent={this.changeMainContent}/> }
                         />
-                      {/*Will act like our else statement in this case where if 
-                      our route matches no other while a user is logged in it just reroutes to there login*/}
-                      <Route
-                        render={() => <Redirect to={`/users/${loggedInUser._id}`} />}
-                      />
+                        <Route path="/photos/:userId"
+                              render ={ props => <UserPhotos {...props} changeMainContent={this.changeMainContent}/> }
+                        />
+                        <Route path="/comments/:userId"
+                              render ={ props => <UserComments {...props} changeMainContent={this.changeMainContent} advanced_features={this.state.advanced_features}/> }
+                        />
+                        <Route path="/single-photo/:photoId"
+                              render ={ props => <SinglePhoto {...props} changeMainContent={this.changeMainContent} advanced_features={this.state.advanced_features}/> }
+                          />
+                        {/*Will act like our else statement in this case where if 
+                        our route matches no other while a user is logged in it just reroutes to there login*/}
+                        <Route
+                          render={() => <Redirect to={`/users/${loggedInUser._id}`} />}
+                        />
                     </Switch>
                   </Paper>
                 </Grid>
-                </Grid>
-                </>
+              </Grid>
             )}
             {/*If no users are logged in we will just redirect to our login page getting any 
             bad URLs to prevent deep links*/}
             <Route render={() => <Redirect to="/login" />}/>
-          </Switch>
+            </Switch>
         </div>
       </HashRouter>
     );
