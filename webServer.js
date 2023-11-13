@@ -52,7 +52,7 @@ const Photo = require("./schema/photo.js");
 const SchemaInfo = require("./schema/schemaInfo.js");
 
 mongoose.set("strictQuery", false);
-// Modify the mongoose.connect to connect to your MongoDB database.
+// Modify the mongoose.connect to your MongoDB database.
 mongoose.connect("mongodb://127.0.0.1:27017/project6", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -70,6 +70,7 @@ async function getCollectionCounts() {
     photo: photoCount,
   };
 }
+
 
 app.use(express.static(__dirname));
 app.use(bodyParser.json());
