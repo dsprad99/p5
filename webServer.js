@@ -216,46 +216,7 @@ app.get("/photo/:id", async function (request, response) {
     response.status(400).json({ error: "No photo found" });
   }
 });
-app.post("/photos/new", function (request, response) {
-  if (hasNoUserSession(request, response)) return;
-  const user_id = getSessionUserID(request) || "";
-  if (user_id === "") {
-    console.error("Error in /photos/new", user_id);
-    response.status(400).send("user_id required");
-    return;
-  }
-  processFormBody(request, response, function (err) {
-    if (err || !request.file) {
-      console.error("Error in /photos/new", err);
-      response.status(400).send("photo required");
-      return;
-    }
-    const timestamp = new Date().valueOf();
-    const filename = 'U' +  String(timestamp) + request.file.originalname;
-    fs.writeFile("./images/" + filename, request.file.buffer, function (err) {
-      if (err) {
-        console.error("Error in /photos/new", err);
-        response.status(400).send("error writing photo");
-        return;
-      }
-      Photo.create(
-          {
-            _id: new mongoose.Types.ObjectId(),
-            file_name: filename,
-            date_time: new Date(),
-            user_id: new mongoose.Types.ObjectId(user_id),
-            comment: []
-          })
-          .then((returnValue) => {
-            response.end();
-          })
-          .catch(err => {
-            console.error("Error in /photos/new", err);
-            response.status(500).send(JSON.stringify(err));
-          });
-        });
-      });
-    });
+
 app.post("/commentsOfPhoto/:photo_id", async function (request, response) {
   // get id of photo that new comment should be added to
   const photoId = request.params.photo_id;
@@ -332,6 +293,46 @@ function loggedInCheck(req, res, next) {
 }
 
 app.use(loggedInCheck);
+
+app.post("/photos/new", loggedInCheck , function (request, response) {
+  const user_id = request.session.user._id;
+  if (user_id === "") {
+    console.error("Error in /photos/new", user_id);
+    response.status(400).send("user_id required");
+    return;
+  }
+  processFormBody(request, response, function (err) {
+    if (err || !request.file) {
+      console.error("Error in /photos/new", err);
+      response.status(400).send("photo required");
+      return;
+    }
+    const timestamp = new Date().valueOf();
+    const filename = 'U' +  String(timestamp) + request.file.originalname;
+    fs.writeFile("./images/" + filename, request.file.buffer, function (err) {
+      if (err) {
+        console.error("Error in /photos/new", err);
+        response.status(400).send("error writing photo");
+        return;
+      }
+      Photo.create(
+          {
+            _id: new mongoose.Types.ObjectId(),
+            file_name: filename,
+            date_time: new Date(),
+            user_id: new mongoose.Types.ObjectId(user_id),
+            comment: []
+          })
+          .then((returnValue) => {
+            response.end();
+          })
+          .catch(err => {
+            console.error("Error in /photos/new", err);
+            response.status(500).send(JSON.stringify(err));
+          });
+        });
+      });
+  });
 
 const server = app.listen(3000, function () {
   const port = server.address().port;
