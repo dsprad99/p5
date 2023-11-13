@@ -1,7 +1,7 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
 import {
-    AppBar, Toolbar, Typography, Checkbox, Button
+    AppBar, Toolbar, Typography, Checkbox, Button, Alert, Snackbar
 } from '@mui/material';
 import './TopBar.css';
 import axios from 'axios';
@@ -11,11 +11,15 @@ class TopBar extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            app_info: undefined
+            app_info: undefined,
+            photo_upload_show: false,
+            photo_upload_error: false,
+            photo_upload_success: false
         };
 
         this.toggleFeature = props.toggle_feature;
         this.handleLogout = this.handleLogout.bind(this); 
+        this.handleNewPhoto = this.handleNewPhoto.bind(this);
     }
 
     componentDidMount() {
@@ -49,6 +53,38 @@ class TopBar extends React.Component {
         }
     };
 
+    handleNewPhoto = (e) => {
+        e.preventDefault();
+        if (this.uploadInput.files.length > 0) {
+            const domForm = new FormData();
+            domForm.append('uploadedphoto', this.uploadInput.files[0]);
+            axios.post("/photos/new", domForm)
+                .then((response) => {
+                    this.setState({
+                        photo_upload_show: true,
+                        photo_upload_error: false,
+                        photo_upload_success: true
+                    });
+                })
+                .catch(error => {
+                    this.setState({
+                        photo_upload_show: true,
+                        photo_upload_error: true,
+                        photo_upload_success: false
+                    });
+                    console.log(error);
+                });
+        }
+    }
+    
+    handleClose = () => {
+        this.setState({
+            photo_upload_show: false,
+            photo_upload_error: false,
+            photo_upload_success: false
+        });
+    }
+
     render() {
         {/*get the loggedInUser passed from props*/}
         const { loggedInUser, advanced_features } = this.props; 
@@ -74,6 +110,19 @@ class TopBar extends React.Component {
                             <Button variant="contained" color="error" onClick={this.handleLogout} sx={{ m: 2 }}>
                                 Logout
                             </Button>
+                            <Button component="label" variant="contained">
+                                Add Photo
+                                <input type="file" accept = "image/*" hidden ref={(domFileRef) => { this.uploadInput = domFileRef; }} onChange={this.handleNewPhoto}/>
+                            </Button>
+                            <Snackbar anchorOrigin={{vertical: 'top', horizontal: 'left'}} open={this.state.photo_upload_show} autoHideDuration={6000} onClose={this.handleClose}>
+                                {
+                                    this.state.photo_upload_success ?
+                                        <Alert onClose={this.handleClose} severity="success" sx={{ width: '100%' }}>Photo Uploaded</Alert> :
+                                        this.state.photo_upload_error ?
+                                            <Alert onClose={this.handleClose} severity="error" sx={{ width: '100%' }}>Error Uploading Photo</Alert> :
+                                            <div/>
+                                }
+                            </Snackbar>
                             <Typography sx={{ flexGrow: 1 }}></Typography>
                         </React.Fragment>
                     )}
