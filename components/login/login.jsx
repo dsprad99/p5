@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Box, Button, TextField, Typography, Snackbar, Alert } from '@mui/material';
+import { Box, Grid, Button, TextField, Typography, Snackbar, Alert } from '@mui/material';
 import axios from 'axios';
 
-function LoginRegister = (props) => {
+function LoginRegister(props) {
    /*state hook to help manage credential as default will be empty*/
   const [credentials, setCredentials] = useState({
       username: '',
@@ -92,47 +92,54 @@ function LoginRegister = (props) => {
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} noValidate sx={{
+    <Grid component="form" container onSubmit={handleSubmit} noValidate spacing={3}>
+      <Grid component="div" item onSubmit={handleSubmit} noValidate xs>
+        <Box component="form" onSubmit={handleSubmit} noValidate sx={{
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        height: '50vh',
         flexDirection: 'column', 
       }}>
-      <Typography component="h1" variant="h5">
-        Log In
-      </Typography>
-      <TextField
-        margin="normal"
-        required
-        fullWidth
-        label="Username"
-        name="username"
-        autoComplete="username"
-        value={credentials.username}
-        onChange={handleChange}
-      />
-
+        <Typography component="h1" variant="h5">
+          Log In
+        </Typography>
         <TextField
-            margin="normal"
-            required
-            fullWidth
-            label="Password"
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            value={credentials.password}
-            onChange={handleChange}
-        />
+          margin="normal"
+          required
+          label="Username"
+          name="username"
+          autoComplete="username"
+          value={credentials.username}
+          onChange={handleChange}
+          />
 
-      <Button
-        type="submit"
-        fullWidth
-        variant="contained"
-        sx={{ mt: 3, mb: 3 }}
-      >
-        Log In
-      </Button>
+          <TextField
+              margin="normal"
+              required
+              label="Password"
+              name="password"
+              type="password"
+              autoComplete="current-password"
+              value={credentials.password}
+              onChange={handleChange}
+              />
+
+        <Button
+          type="submit"
+          variant="contained"
+          sx={{ mt: 3, mb: 3 }}
+          >
+          Log In
+        </Button>
+        </Box>
+      </Grid>
+      <Grid component="div" item onSubmit={handleSubmit} noValidate xs>
+        <Box component="form" onSubmit={handleSubmit} noValidate sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'column', 
+      }}>
 
         <Typography component="h1" variant="h5">
             Register
@@ -140,81 +147,75 @@ function LoginRegister = (props) => {
         <TextField
             margin="normal"
             required
-            fullWidth
             label="First Name"
             name="firstName"
             autoComplete="first-name"
             value={credentials.firstName}
             onChange={handleChange}
-        />
+            />
         <TextField
             margin="normal"
             required
-            fullWidth
             label="Last Name"
             name="lastName"
             autoComplete="last-name"
             value={credentials.lastName}
             onChange={handleChange}
-        />
+            />
         <TextField
             margin="normal"
-            fullWidth
             label="Location"
             name="location"
             autoComplete="location"
             value={credentials.location}
             onChange={handleChange}
-        />
+            />
         <TextField
             margin="normal"
-            fullWidth
             label="Description"
             name="description"
             autoComplete="off"
             value={credentials.description}
             onChange={handleChange}
-        />
+            />
         <TextField
             margin="normal"
-            fullWidth
             label="Occupation"
             name="occupation"
             autoComplete="occupation-title"
             value={credentials.occupation}
             onChange={handleChange}
-        />
+            />
         <TextField
             margin="normal"
             required
-            fullWidth
             label="Password"
             name="password"
             type="password"
             autoComplete="current-password"
             value={credentials.password}
             onChange={handleChange}
-        />
+            />
         <TextField
             margin="normal"
             required
-            fullWidth
             label="Confirm Password"
             name="confirmPassword"
             type="password"
             autoComplete="current-password"
             value={credentials.confirmPassword}
             onChange={handleChange}
-        />
+            />
         <Button
             type="submit"
-            fullWidth
             variant="contained"
             color="primary"
             onClick={handleRegister}
         >
             Register Me
         </Button>
+        </Box>
+      </Grid>
 
       <Snackbar
       open={openSnackbar}
@@ -225,9 +226,9 @@ function LoginRegister = (props) => {
           {error}
       </Alert>
       </Snackbar>
-    </Box>
+    </Grid>
   );
-};
+}
 
 export default LoginRegister;
 

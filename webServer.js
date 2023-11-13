@@ -291,9 +291,9 @@ app.post('/user', async function (request, response) {
 
 //route to log in a user
 app.post("/admin/login", async function (request, response) {
-  const {userName, password} = request.body;
+  const {username, password} = request.body;
   //our user value is set to the users userName
-  let user = await User.findOne({ login_name: userName });
+  let user = await User.findOne({ login_name: username });
   if (!user || user.password !== password) {
     response.status(400).json({ error: "Login Failed" });
   } else {
