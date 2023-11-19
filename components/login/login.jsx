@@ -21,6 +21,7 @@ function LoginRegister(props) {
   });
   /*set the state for our error as false to start*/
   const [openSnackbar, setOpenSnackbar] = useState(false); 
+  const [openSuccessfulSnackbar, setOpenSuccessfulSnackbar] = useState(false); 
   const [error, setError] = useState(''); 
 
   /*event handler to update the state with new input for login*/
@@ -86,7 +87,7 @@ function LoginRegister(props) {
                 occupation: '',
             });
             setError('Registration successful');
-            setOpenSnackbar(true);
+            setOpenSuccessfulSnackbar(true);
             // eslint-disable-next-line no-shadow
         } catch (error) {
             setError('Registration failed. Please check your information.');
@@ -99,6 +100,14 @@ function LoginRegister(props) {
       return;
     }
     setOpenSnackbar(false);
+    setError('');
+  };
+
+  const handleCloseSuccessfulSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSuccessfulSnackbar(false);
     setError('');
   };
 
@@ -248,12 +257,21 @@ function LoginRegister(props) {
           {error}
       </Alert>
       </Snackbar>
+
+      <Snackbar
+      open={openSuccessfulSnackbar}
+      onClose={handleCloseSuccessfulSnackbar}
+      anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+      <Alert onClose={handleCloseSuccessfulSnackbar} severity="error" sx={{ width: '90%' }}>
+          {error}
+      </Alert>
+      </Snackbar>
     </Grid>
   );
 }
 
 export default LoginRegister;
-
 
 
 
