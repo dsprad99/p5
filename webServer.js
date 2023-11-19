@@ -131,12 +131,39 @@ app.get("/user/:id", async function (request, response) {
   const userId = request.params.id;
 
   try {
-    const user = JSON.parse(JSON.stringify(await User.findById(userId)));
-    delete user.__v;
+    const user = await User.findById(userId);
+    if (!user) {
+      response.status(400).json({ error: "User not found" });
+      return;
+    }
 
-    response.json(user);
+    //fetch the last photo that matches the userID of whos it is
+    const mostRecentPost = await Photo.findOne({ user_id: userId }).sort({ date_time: -1 }).lean();
+
+    // Fetch the photo with the most comments
+    const mostCommentedPhoto = await Photo.aggregate([
+    //find the matching userID of the photo
+    { $match: { user_id: mongoose.Types.ObjectId(userId) } }, 
+    //added a field for the number of comments on a photo
+    { $addFields: { commentsCount: { $size: "$comments" } } }, 
+    //put the number of comments in descending order
+    { $sort: { commentsCount: -1 } }, 
+    //limit to the first document
+    { $limit: 1 } 
+  ]);
+
+  
+    const result = {
+      user,
+      mostRecentPost,
+      //if the array is not empty we will take the first element
+      //which should have the most comments
+      mostCommentedPhoto: mostCommentedPhoto[0] || null
+    };
+
+    response.json(result);
   } catch (error) {
-    response.status(400).json({ error: "User not found" });
+    response.status(500).json({ error: error.message });
   }
 });
 
@@ -385,3 +412,4 @@ const server = app.listen(3000, function () {
       __dirname
   );
 });
+
