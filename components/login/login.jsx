@@ -263,7 +263,7 @@ function LoginRegister(props) {
       onClose={handleCloseSuccessfulSnackbar}
       anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
-      <Alert onClose={handleCloseSuccessfulSnackbar} severity="error" sx={{ width: '90%' }}>
+      <Alert onClose={handleCloseSuccessfulSnackbar} severity="success" sx={{ width: '90%' }}>
           {error}
       </Alert>
       </Snackbar>
